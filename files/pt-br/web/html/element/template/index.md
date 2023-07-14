@@ -148,6 +148,48 @@ table td {
 
 {{EmbedLiveSample("Example", 500, 120)}}
 
+
+## Avoiding DocumentFragment pitfall
+
+A {{domxref("DocumentFragment")}} is not a valid target for various events, as such it is often preferable to clone or refer to the elements within it.
+
+Consider the following HTML and JavaScript:
+
+### HTML
+
+```html
+<div id="container"></div>
+
+<template id="template">
+  <div>Click me</div>
+</template>
+```
+
+### JavaScript
+
+```js
+const container = document.getElementById("container");
+const template = document.getElementById("template");
+
+function clickHandler(event) {
+  event.target.append(" — Clicked this div");
+}
+
+const firstClone = template.content.cloneNode(true);
+firstClone.addEventListener("click", clickHandler);
+container.appendChild(firstClone);
+
+const secondClone = template.content.firstElementChild.cloneNode(true);
+secondClone.addEventListener("click", clickHandler);
+container.appendChild(secondClone);
+```
+
+### Result
+
+`firstClone` is a DocumentFragment instance, so while it gets appended inside the container as expected, clicking on it does not trigger the click event. `secondClone` is an [HTMLDivElement](/en-US/docs/Web/API/HTMLDivElement) instance, clicking on it works as one would expect.
+
+{{EmbedLiveSample('Avoiding_DocumentFragment_pitfall')}}
+
 ## Especificações
 
 | Especificação                                                                                                        | Estado                           | Comentário        |
